@@ -42,9 +42,6 @@ class JobApplicationModel(Base):
     notes = Column(String, nullable=True)
 
 
-Base.metadata.create_all(bind=engine)
-
-
 def get_db():
     db = SessionLocal()
     try:
@@ -87,6 +84,11 @@ app = FastAPI(
     description="Track job applications: company, role, status, and notes.",
     version="1.0.0",
 )
+
+
+@app.on_event("startup")
+def create_tables() -> None:
+    Base.metadata.create_all(bind=engine)
 
 
 @app.get("/health", tags=["infra"])

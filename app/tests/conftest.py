@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import app.main as main
 from app.main import app, Base, get_db
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -14,6 +15,7 @@ engine = create_engine(
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+main.engine = engine  # app's startup hook creates tables on this engine, not real Postgres
 
 
 @pytest.fixture()
