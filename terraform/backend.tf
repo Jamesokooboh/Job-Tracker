@@ -20,7 +20,7 @@ terraform {
   #     --key-schema AttributeName=LockID,KeyType=HASH \
   #     --billing-mode PAY_PER_REQUEST
   backend "s3" {
-    bucket         = "REPLACE_WITH_YOUR_TF_STATE_BUCKET"
+    bucket         = "job-tracker-tfstate-950964300115"
     key            = "job-tracker/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "job-tracker-tf-locks"
