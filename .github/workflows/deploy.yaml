@@ -29,6 +29,25 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+
+      # The image below needs somewhere to push to, but the ECR repo is
+      # defined in Terraform and normally only created by the approval-gated
+      # terraform-apply job further down. Bootstrap just that one resource
+      # here so a first-ever deploy isn't stuck in a chicken-and-egg loop.
+      # Every real infra change still waits for the production environment
+      # approval in the terraform-apply job below.
+      - name: Ensure ECR repository exists
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -target=aws_ecr_repository.app \
+            -target=aws_ecr_lifecycle_policy.app
+
       - name: Login to ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
